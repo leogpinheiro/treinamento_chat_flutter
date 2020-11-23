@@ -1,27 +1,33 @@
-import 'package:flutter_socket_io/flutter_socket_io.dart';
-import 'package:flutter_socket_io/socket_io_manager.dart';
+import 'dart:developer';
+
+//import 'package:socket_io/socket_io.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class SocketControl {
-  SocketIO socketIO;
+  IO.Socket socket;
 
   fazConexao() {
-    this.socketIO = SocketIOManager().createSocketIO("http://192.168.0.179:3000", "");
-    this.socketIO.init();
-    this.socketIO.connect();
-  }
+    this.socket = IO.io('http://192.168.0.179:3000', <String, dynamic>{
+      'transports': ['websocket'],
+      'extraHeaders': {'foo': 'bar'} // optional
+    });
 
-  _socketStatus(dynamic data) {
-    print("Socket status: " + data);
-  }
+    this.socket.connect();
 
-  _subscribes() {
-    if (this.socketIO != null) {
-      this.socketIO.subscribe("chat_direct", _onReceiveChatMessage);
-    }
+    print(">>>>>>>> Cheguei aqui");
+
+    this.socket.on('chat_share_message', _onReceiveChatMessage);
+    this.socket.emit("chat_send_message", {'sala': 'minhaSala', 'mensagem': 'meuTexto', 'momento': '2020-11-23 17:43', 'clientId': '123456789'});
   }
 
   void _onReceiveChatMessage(dynamic message) {
-    print("Message from UFO: " + message);
+    print("\n >>>>>> Messagem recebida: ");
+    inspect(message);
+  }
+
+/*
+  _socketStatus(dynamic data) {
+    print("Socket status: " + data);
   }
 
   void _sendChatMessage(String msg) async {
@@ -37,4 +43,5 @@ class SocketControl {
       SocketIOManager().destroySocket(this.socketIO);
     }
   }
+  */
 }
