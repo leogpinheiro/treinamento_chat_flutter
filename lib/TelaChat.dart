@@ -93,6 +93,15 @@ class _TelaChatState extends State<TelaChat> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.nomeMeuUsuario),
+        actions: [
+          IconButton(
+              icon: new Icon(Icons.exit_to_app),
+              tooltip: 'Sair do Chat',
+              onPressed: () {
+                widget.channel.destroySocket();
+                Navigator.pop(context);
+              })
+        ],
       ),
       body: ListView(
         children: <Widget>[
@@ -111,7 +120,7 @@ class _TelaChatState extends State<TelaChat> {
 
   @override
   void dispose() {
-    widget.channel.socket.sink.close();
+    widget.channel.destroySocket();
     super.dispose();
   }
 }

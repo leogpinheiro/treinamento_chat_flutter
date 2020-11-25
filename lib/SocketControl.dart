@@ -36,11 +36,11 @@ class SocketControl {
     }
   }
 
-  _socketStatus(dynamic data) {
+  socketStatus(dynamic data) {
     print("Socket status: " + data);
   }
 
-  _destroySocket() {
+  destroySocket() {
     if (this.socket != null) {
       this.socket.sink.close();
     }
