@@ -29,7 +29,10 @@ class SocketControl {
   void enviaMensagem(jsonData) {
     if (this.socket != null) {
       Map<String, dynamic> decoded = jsonDecode(jsonData);
-      this.socket.sink.add(json.encode({'info': 'chat_send_message', 'sala': 'Geral', 'mensagem': decoded['mensagem'], 'momento': new DateFormat.yMd().add_Hm().toString(), 'clientId': this.meuId}));
+      final minhaData = new DateFormat.yMd().add_Hm().format(DateTime.now());
+      print("minhaData = ");
+      print(minhaData);
+      this.socket.sink.add(json.encode({'info': 'chat_send_message', 'sala': 'Geral', 'mensagem': decoded['mensagem'], 'momento': minhaData, 'clientId': this.meuId}));
     }
   }
 
