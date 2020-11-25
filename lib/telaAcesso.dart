@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:testechatleo/TelaChat.dart';
-import 'SocketControl.dart';
+import 'package:testechatleo/SocketControl.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -14,7 +14,6 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController myTextController = TextEditingController();
 
   void goToMainPage(String nomeUsuario, BuildContext context) {
-    new SocketControl().fazConexao();
     Navigator.push(context, MaterialPageRoute(builder: (context) => TelaChat(nomeUsuario)));
   }
 
@@ -31,7 +30,7 @@ class _MyHomePageState extends State<MyHomePage> {
               TextField(
                 controller: myTextController,
                 decoration: InputDecoration(labelText: "Nome"),
-                onSubmitted: (nomeUsuario) => goToMainPage(nomeUsuario, context),
+                //onSubmitted: (nomeUsuario) => goToMainPage(nomeUsuario, context),
               ),
             ],
           ),
