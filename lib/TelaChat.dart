@@ -37,11 +37,35 @@ class _TelaChatState extends State<TelaChat> {
 //=================================================================================================
 
   Widget buildSingleMessage(Mensagem mensagem) {
+    bool souEu = mensagem.clientId == _channel.meuId;
+
     return Container(
-      alignment: mensagem.clientId == _channel.meuId ? Alignment.centerRight : Alignment.centerLeft,
-      padding: EdgeInsets.all(10.0),
-      margin: EdgeInsets.all(10.0),
-      child: Text(mensagem.mensagem),
+      decoration: BoxDecoration(
+        color: souEu ? Colors.green.shade100 : Colors.blue.shade100,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30.0),
+          topRight: Radius.circular(30.0),
+          bottomLeft: Radius.circular(30.0),
+          bottomRight: Radius.circular(30.0),
+        ),
+      ),
+      alignment: souEu ? Alignment.centerLeft : Alignment.centerRight,
+      padding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 15.0),
+      margin: souEu ? EdgeInsets.only(top: 10.0, bottom: 10.0, left: 100.0) : EdgeInsets.only(top: 10.0, bottom: 10.0, right: 100.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            mensagem.momento,
+            textAlign: souEu ? TextAlign.left : TextAlign.right,
+          ),
+          SizedBox(height: 10.0),
+          Text(
+            mensagem.mensagem,
+            textAlign: souEu ? TextAlign.left : TextAlign.right,
+          ),
+        ],
+      ),
     );
   }
 
@@ -54,6 +78,7 @@ class _TelaChatState extends State<TelaChat> {
         model.idAtual = _channel.meuId;
         _minhasMensagens = model.pegaMensagensNaSala(widget.salaChat);
         return Container(
+          padding: EdgeInsets.all(10.0),
           height: MediaQuery.of(context).size.height * 0.75,
           child: ListView.builder(
             itemCount: _minhasMensagens?.length ?? 0,
