@@ -175,7 +175,7 @@ class _TelaChatState extends State<TelaChat> {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Usuários ativos em "' + widget.salaChat + '"',
+                    '${_meusUsuarios?.length ?? 0}' + ' - Usuários ativos em "' + widget.salaChat + '"',
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
