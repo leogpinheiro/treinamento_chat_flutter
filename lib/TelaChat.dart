@@ -6,33 +6,31 @@ import 'ChatModel.dart';
 import 'dart:convert';
 
 //=================================================================================================
-
 class TelaChat extends StatefulWidget {
+  final String salaChat;
   final String nomeMeuUsuario;
-  String salaChat;
-  SocketControl channel;
   TelaChat(this.nomeMeuUsuario, this.salaChat);
-  List<Mensagem> _minhasMensagens;
 
   @override
   _TelaChatState createState() => _TelaChatState();
 }
 
 //=================================================================================================
-
 class _TelaChatState extends State<TelaChat> {
   final TextEditingController textEditingController = TextEditingController();
+  List<Mensagem> _minhasMensagens;
+  SocketControl _channel;
 
   @override
   void initState() {
     super.initState();
     ScopedModel.of<ChatModel>(context, rebuildOnChange: false).init();
-    widget.channel = new SocketControl(widget.nomeMeuUsuario);
+    _channel = new SocketControl(widget.nomeMeuUsuario);
   }
 
   void _atualizaLista(model) {
     setState(() {
-      widget._minhasMensagens = model.pegaMensagensNaSala(widget.salaChat);
+      _minhasMensagens = model.pegaMensagensNaSala(widget.salaChat);
     });
   }
 
@@ -40,7 +38,7 @@ class _TelaChatState extends State<TelaChat> {
 
   Widget buildSingleMessage(Mensagem mensagem) {
     return Container(
-      alignment: mensagem.clientId == widget.channel.meuId ? Alignment.centerRight : Alignment.centerLeft,
+      alignment: mensagem.clientId == _channel.meuId ? Alignment.centerRight : Alignment.centerLeft,
       padding: EdgeInsets.all(10.0),
       margin: EdgeInsets.all(10.0),
       child: Text(mensagem.mensagem),
@@ -52,15 +50,15 @@ class _TelaChatState extends State<TelaChat> {
   Widget buildChatList() {
     return ScopedModelDescendant<ChatModel>(
       builder: (context, child, model) {
-        widget.channel.chatModel = model;
-        model.idAtual = widget.channel.meuId;
-        widget._minhasMensagens = model.pegaMensagensNaSala(widget.salaChat);
+        _channel.chatModel = model;
+        model.idAtual = _channel.meuId;
+        _minhasMensagens = model.pegaMensagensNaSala(widget.salaChat);
         return Container(
           height: MediaQuery.of(context).size.height * 0.75,
           child: ListView.builder(
-            itemCount: widget._minhasMensagens.length,
+            itemCount: _minhasMensagens.length,
             itemBuilder: (BuildContext context, int index) {
-              return buildSingleMessage(widget._minhasMensagens[index]);
+              return buildSingleMessage(_minhasMensagens[index]);
             },
           ),
         );
@@ -110,7 +108,7 @@ class _TelaChatState extends State<TelaChat> {
               icon: new Icon(Icons.exit_to_app),
               tooltip: 'Sair do Chat',
               onPressed: () {
-                widget.channel.destroySocket();
+                _channel.destroySocket();
                 Navigator.pop(context);
               })
         ],
@@ -128,7 +126,7 @@ class _TelaChatState extends State<TelaChat> {
 
   void _sendMessage(model) {
     if (textEditingController.text.isNotEmpty) {
-      widget.channel.enviaMensagem(json.encode({'mensagem': textEditingController.text, 'clientId': widget.channel.meuId}));
+      _channel.enviaMensagem(json.encode({'mensagem': textEditingController.text, 'clientId': _channel.meuId}));
       _atualizaLista(model);
     }
   }
@@ -137,7 +135,7 @@ class _TelaChatState extends State<TelaChat> {
 
   @override
   void dispose() {
-    widget.channel.destroySocket();
+    _channel.destroySocket();
     super.dispose();
   }
 }

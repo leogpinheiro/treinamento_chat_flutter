@@ -9,18 +9,17 @@ class ChatModel extends Model {
   String sala;
   List<Usuario> usuarios = List<Usuario>();
   List<Usuario> listaAmigos = List<Usuario>();
-  List<Mensagem> messages = List<Mensagem>();
   List<Sala> salas = List<Sala>();
 
   //=============================================================================================================================
 
   void init() {
-    atualizaUsuarios();
+    atualizaPontas();
   }
 
   //=============================================================================================================================
 
-  void atualizaUsuarios() {
+  void atualizaPontas() {
     if (usuarios.length > 0) {
       usuarioAtual = usuarios.firstWhere((usuario) => usuario.idUsuario == idAtual && usuario.sala == sala);
       listaAmigos = usuarios.where((usuario) => usuario.idUsuario != idAtual && usuario.sala == sala).toList();
@@ -32,19 +31,22 @@ class ChatModel extends Model {
 
   void adicionaUsuario(dados) {
     Usuario instanciaUsuario = new Usuario(dados["nome"], dados["clientId"], dados["sala"]);
-    usuarios.add(instanciaUsuario);
-    Sala salaAlvo = salas.firstWhere((sala) => sala.nome == instanciaUsuario.sala);
-    salaAlvo.usuarios.add(instanciaUsuario);
-    atualizaUsuarios();
+    if (!salas.contains(usuarios)) {
+      usuarios.add(instanciaUsuario);
+      Sala salaAlvo = salas.firstWhere((sala) => sala.nome == instanciaUsuario.sala);
+      salaAlvo.usuarios.add(instanciaUsuario);
+      atualizaPontas();
+    }
   }
 
   //=============================================================================================================================
 
   void adicionaSala(nomeSala) {
     Sala instanciaSala = new Sala(nomeSala);
-    instanciaSala.usuarios = usuarios.where((usuario) => usuario.sala == sala).toList();
-    salas.add(instanciaSala);
-    atualizaUsuarios();
+    if (!salas.contains(instanciaSala)) {
+      salas.add(instanciaSala);
+      atualizaPontas();
+    }
   }
 
   //=============================================================================================================================
@@ -53,17 +55,22 @@ class ChatModel extends Model {
     print("dados adicionados:");
     print(dados);
     Mensagem instanciaMensagem = new Mensagem(dados['sala'], dados['mensagem'], dados['momento'], dados['clientId']);
-    messages.add(instanciaMensagem);
-    Sala salaAlvo = salas.firstWhere((sala) => sala.nome == instanciaMensagem.sala);
-    salaAlvo.mensagens.add(instanciaMensagem);
-    atualizaUsuarios();
+    if (salas.length > 0) {
+      Sala salaAlvo = salas.firstWhere((sala) => sala.nome == instanciaMensagem.sala);
+      salaAlvo.mensagens.add(instanciaMensagem);
+    }
+    atualizaPontas();
   }
 
   //=============================================================================================================================
 
   List<Mensagem> pegaMensagensNaSala(String nomeSala) {
-    Sala salaAlvo = salas.firstWhere((sala) => sala.nome == nomeSala);
-    return salaAlvo.mensagens.toList();
+    if (salas.length > 0) {
+      Sala salaAlvo = salas.firstWhere((sala) => sala.nome == nomeSala);
+      return salaAlvo.mensagens.toList();
+    } else {
+      return null;
+    }
   }
 
   //=============================================================================================================================

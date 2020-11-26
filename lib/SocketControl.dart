@@ -6,7 +6,7 @@ import 'ChatModel.dart';
 class SocketControl {
   //
   IOWebSocketChannel socket;
-  String meuId;
+  String meuId = '';
   String nomeUsuario;
   ChatModel chatModel;
 
@@ -24,8 +24,14 @@ class SocketControl {
       switch (data['info']) {
         case 'chat_update_status':
           {
-            meuId = data['clientId'];
-            if (chatModel != null) chatModel.atualizaUsuarios();
+            if (chatModel != null) {
+              if (this.meuId == '') {
+                this.meuId = data['clientId'];
+                chatModel.adicionaSala({'nome': 'Geral'});
+                chatModel.adicionaUsuario({'nome': this.nomeUsuario, 'clientId': this.meuId, 'sala': 'Geral'});
+              }
+              chatModel.atualizaPontas();
+            }
           }
           break;
         case 'chat_share_message':
