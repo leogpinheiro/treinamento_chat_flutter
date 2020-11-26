@@ -56,7 +56,7 @@ class _TelaChatState extends State<TelaChat> {
         return Container(
           height: MediaQuery.of(context).size.height * 0.75,
           child: ListView.builder(
-            itemCount: _minhasMensagens.length,
+            itemCount: _minhasMensagens?.length ?? 0,
             itemBuilder: (BuildContext context, int index) {
               return buildSingleMessage(_minhasMensagens[index]);
             },

@@ -27,10 +27,10 @@ class SocketControl {
             if (chatModel != null) {
               if (this.meuId == '') {
                 this.meuId = data['clientId'];
-                chatModel.adicionaSala({'nome': 'Geral'});
+                chatModel.adicionaSala('Geral');
                 chatModel.adicionaUsuario({'nome': this.nomeUsuario, 'clientId': this.meuId, 'sala': 'Geral'});
               }
-              chatModel.atualizaPontas();
+              chatModel.atualizaPontas('Geral');
             }
           }
           break;
