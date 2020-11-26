@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:scoped_model/scoped_model.dart';
 import './Usuario.dart';
 import './Sala.dart';
@@ -71,6 +69,15 @@ class ChatModel extends Model {
     if (salas != null && salas.length > 0) {
       Sala salaAlvo = salas.firstWhere((sala) => sala.nome == nomeSala);
       return salaAlvo?.mensagens?.toList();
+    } else {
+      return null;
+    }
+  }
+
+  List<Usuario> pegaUsuariosNaSala(String nomeSala) {
+    if (salas != null && salas.length > 0) {
+      Sala salaAlvo = salas.firstWhere((sala) => sala.nome == nomeSala);
+      return salaAlvo?.usuarios?.toList();
     } else {
       return null;
     }

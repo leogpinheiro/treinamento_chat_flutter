@@ -5,6 +5,8 @@ import 'Mensagem.dart';
 import 'ChatModel.dart';
 import 'dart:convert';
 
+import 'Usuario.dart';
+
 //=================================================================================================
 class TelaChat extends StatefulWidget {
   final String salaChat;
@@ -19,6 +21,7 @@ class TelaChat extends StatefulWidget {
 class _TelaChatState extends State<TelaChat> {
   final TextEditingController textEditingController = TextEditingController();
   List<Mensagem> _minhasMensagens;
+  List<Usuario> _meusUsuarios;
   SocketControl _channel;
 
   @override
@@ -31,6 +34,7 @@ class _TelaChatState extends State<TelaChat> {
   void _atualizaLista(model) {
     setState(() {
       _minhasMensagens = model.pegaMensagensNaSala(widget.salaChat);
+      _meusUsuarios = model.pegaUsuariosNaSala(widget.salaChat);
     });
   }
 
@@ -38,6 +42,7 @@ class _TelaChatState extends State<TelaChat> {
 
   Widget buildSingleMessage(Mensagem mensagem) {
     bool souEu = mensagem.clientId == _channel.meuId;
+    Usuario usuarioAutor = _meusUsuarios.firstWhere((usuario) => usuario.idUsuario == mensagem.clientId);
 
     return Container(
       decoration: BoxDecoration(
@@ -49,14 +54,13 @@ class _TelaChatState extends State<TelaChat> {
           bottomRight: Radius.circular(30.0),
         ),
       ),
-      alignment: souEu ? Alignment.centerLeft : Alignment.centerRight,
       padding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 15.0),
       margin: souEu ? EdgeInsets.only(top: 10.0, bottom: 10.0, left: 100.0) : EdgeInsets.only(top: 10.0, bottom: 10.0, right: 100.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            mensagem.momento,
+            souEu ? "Eu [" + mensagem.momento + "]" : usuarioAutor.nomeUsuario + " [" + mensagem.momento + "]",
             textAlign: souEu ? TextAlign.left : TextAlign.right,
           ),
           SizedBox(height: 10.0),
@@ -77,6 +81,7 @@ class _TelaChatState extends State<TelaChat> {
         _channel.chatModel = model;
         model.idAtual = _channel.meuId;
         _minhasMensagens = model.pegaMensagensNaSala(widget.salaChat);
+        _meusUsuarios = model.pegaUsuariosNaSala(widget.salaChat);
         return Container(
           padding: EdgeInsets.all(10.0),
           height: MediaQuery.of(context).size.height * 0.75,

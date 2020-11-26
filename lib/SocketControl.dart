@@ -36,6 +36,7 @@ class SocketControl {
           break;
         case 'chat_share_message':
           {
+            chatModel.adicionaUsuario({'nome': data['nome'], 'clientId': data['clientId'], 'sala': 'Geral'});
             recebeMensagem(data);
           }
           break;
