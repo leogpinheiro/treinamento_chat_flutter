@@ -4,7 +4,6 @@ import 'SocketControl.dart';
 import 'Mensagem.dart';
 import 'ChatModel.dart';
 import 'dart:convert';
-
 import 'Usuario.dart';
 
 //=================================================================================================
@@ -84,6 +83,20 @@ class _TelaChatState extends State<TelaChat> {
 
 //=================================================================================================
 
+  Widget buildSingleUser(Usuario usuario) {
+    print("usuario na lista");
+    print(usuario);
+    bool souEu = usuario.idUsuario == _channel.meuId;
+    return ListTile(
+      title: Text(
+        souEu ? 'Eu' : usuario.nomeUsuario,
+        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+      ),
+    );
+  }
+
+//=================================================================================================
+
   Widget buildChatList() {
     return ScopedModelDescendant<ChatModel>(
       builder: (context, child, model) {
@@ -151,6 +164,36 @@ class _TelaChatState extends State<TelaChat> {
                 Navigator.pop(context);
               })
         ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            Container(
+              height: 100.0,
+              child: DrawerHeader(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Usuários ativos em "' + widget.salaChat + '"',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                decoration: BoxDecoration(color: Colors.blue.shade400),
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.all(10.0),
+              height: MediaQuery.of(context).size.height * 0.75,
+              child: ListView.builder(
+                itemCount: _meusUsuarios?.length ?? 0,
+                itemBuilder: (BuildContext context, int index) {
+                  return buildSingleUser(_meusUsuarios[index]);
+                },
+              ),
+            ),
+          ],
+        ),
       ),
       body: ListView(
         children: <Widget>[
