@@ -11,6 +11,7 @@ class TelaChat extends StatefulWidget {
   final String nomeMeuUsuario;
   SocketControl channel;
   TelaChat(this.nomeMeuUsuario);
+  List<Mensagem> _minhasMensagens;
 
   @override
   _TelaChatState createState() => _TelaChatState();
@@ -26,11 +27,15 @@ class _TelaChatState extends State<TelaChat> {
     super.initState();
     ScopedModel.of<ChatModel>(context, rebuildOnChange: false).init();
     widget.channel = new SocketControl(widget.nomeMeuUsuario);
-    print("=============================================");
-    print("channel socket:");
-    print(widget.channel.socket);
-    print("=============================================");
   }
+
+  void _atualizaLista(model) {
+    setState(() {
+      widget._minhasMensagens = model.getMessagesForChatID(widget.channel.meuId);
+    });
+  }
+
+//=================================================================================================
 
   Widget buildSingleMessage(Mensagem mensagem) {
     return Container(
@@ -41,24 +46,28 @@ class _TelaChatState extends State<TelaChat> {
     );
   }
 
+//=================================================================================================
+
   Widget buildChatList() {
     return ScopedModelDescendant<ChatModel>(
       builder: (context, child, model) {
+        widget.channel.chatModel = model;
         model.idAtual = widget.channel.meuId;
-        List<Mensagem> messages = model.getMessagesForChatID(widget.channel.meuId);
-
+        widget._minhasMensagens = model.getMessagesForChatID(widget.channel.meuId);
         return Container(
           height: MediaQuery.of(context).size.height * 0.75,
           child: ListView.builder(
-            itemCount: messages.length,
+            itemCount: widget._minhasMensagens.length,
             itemBuilder: (BuildContext context, int index) {
-              return buildSingleMessage(messages[index]);
+              return buildSingleMessage(widget._minhasMensagens[index]);
             },
           ),
         );
       },
     );
   }
+
+//=================================================================================================
 
   Widget buildChatArea() {
     return ScopedModelDescendant<ChatModel>(
@@ -75,7 +84,7 @@ class _TelaChatState extends State<TelaChat> {
               SizedBox(width: 10.0),
               FloatingActionButton(
                 onPressed: () {
-                  _sendMessage();
+                  _sendMessage(model);
                   textEditingController.text = '';
                 },
                 elevation: 0,
@@ -87,6 +96,8 @@ class _TelaChatState extends State<TelaChat> {
       },
     );
   }
+
+  //=================================================================================================
 
   @override
   Widget build(BuildContext context) {
@@ -112,11 +123,16 @@ class _TelaChatState extends State<TelaChat> {
     );
   }
 
-  void _sendMessage() {
+  //=================================================================================================
+
+  void _sendMessage(model) {
     if (textEditingController.text.isNotEmpty) {
       widget.channel.enviaMensagem(json.encode({'mensagem': textEditingController.text, 'clientId': widget.channel.meuId}));
+      _atualizaLista(model);
     }
   }
+
+  //=================================================================================================
 
   @override
   void dispose() {

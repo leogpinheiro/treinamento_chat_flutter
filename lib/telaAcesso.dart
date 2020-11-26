@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:testechatleo/TelaChat.dart';
-import 'package:testechatleo/SocketControl.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
