@@ -46,7 +46,7 @@ class _TelaChatState extends State<TelaChat> {
 
     return Container(
       decoration: BoxDecoration(
-        color: souEu ? Colors.green.shade100 : Colors.blue.shade100,
+        color: souEu ? Colors.blue.shade100 : Colors.green.shade100,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(30.0),
           topRight: Radius.circular(30.0),
@@ -59,10 +59,19 @@ class _TelaChatState extends State<TelaChat> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            souEu ? "Eu [" + mensagem.momento + "]" : usuarioAutor.nomeUsuario + " [" + mensagem.momento + "]",
-            textAlign: souEu ? TextAlign.left : TextAlign.right,
-          ),
+          RichText(
+              text: TextSpan(
+            text: souEu ? 'Eu' : usuarioAutor.nomeUsuario,
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54),
+            children: <TextSpan>[
+              TextSpan(
+                text: " [" + mensagem.momento + "]",
+                style: TextStyle(
+                  color: Colors.black38,
+                ),
+              ),
+            ],
+          )),
           SizedBox(height: 10.0),
           Text(
             mensagem.mensagem,
