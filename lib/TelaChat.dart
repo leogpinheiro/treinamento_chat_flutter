@@ -9,8 +9,9 @@ import 'dart:convert';
 
 class TelaChat extends StatefulWidget {
   final String nomeMeuUsuario;
+  String salaChat;
   SocketControl channel;
-  TelaChat(this.nomeMeuUsuario);
+  TelaChat(this.nomeMeuUsuario, this.salaChat);
   List<Mensagem> _minhasMensagens;
 
   @override
@@ -31,7 +32,7 @@ class _TelaChatState extends State<TelaChat> {
 
   void _atualizaLista(model) {
     setState(() {
-      widget._minhasMensagens = model.getMessagesForChatID(widget.channel.meuId);
+      widget._minhasMensagens = model.pegaMensagensNaSala(widget.salaChat);
     });
   }
 
@@ -53,7 +54,7 @@ class _TelaChatState extends State<TelaChat> {
       builder: (context, child, model) {
         widget.channel.chatModel = model;
         model.idAtual = widget.channel.meuId;
-        widget._minhasMensagens = model.getMessagesForChatID(widget.channel.meuId);
+        widget._minhasMensagens = model.pegaMensagensNaSala(widget.salaChat);
         return Container(
           height: MediaQuery.of(context).size.height * 0.75,
           child: ListView.builder(

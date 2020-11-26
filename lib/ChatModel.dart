@@ -54,13 +54,16 @@ class ChatModel extends Model {
     print(dados);
     Mensagem instanciaMensagem = new Mensagem(dados['sala'], dados['mensagem'], dados['momento'], dados['clientId']);
     messages.add(instanciaMensagem);
+    Sala salaAlvo = salas.firstWhere((sala) => sala.nome == instanciaMensagem.sala);
+    salaAlvo.mensagens.add(instanciaMensagem);
     atualizaUsuarios();
   }
 
   //=============================================================================================================================
 
-  List<Mensagem> getMessagesForChatID(String chatID) {
-    return messages.where((msg) => msg.clientId == chatID || msg.sala == chatID).toList();
+  List<Mensagem> pegaMensagensNaSala(String nomeSala) {
+    Sala salaAlvo = salas.firstWhere((sala) => sala.nome == nomeSala);
+    return salaAlvo.mensagens.toList();
   }
 
   //=============================================================================================================================
