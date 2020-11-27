@@ -72,6 +72,8 @@ class SocketControl {
 
   destroySocket() {
     if (this.socket != null) {
+      chatModel.salas.clear();
+      chatModel.listaAmigos.clear();
       this.socket.sink.close();
     }
   }

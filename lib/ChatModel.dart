@@ -38,9 +38,9 @@ class ChatModel extends Model {
         print("\n\n");
         salaAtual.usuarios.add(instanciaUsuario);
         salaAtual?.usuarios?.add(instanciaUsuario);
-        atualizaPontas(dados["sala"]);
       }
     }
+    atualizaPontas(dados["sala"]);
   }
 
   //=============================================================================================================================

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'SocketControl.dart';
@@ -150,6 +152,45 @@ class _TelaChatState extends State<TelaChat> {
 
   //=================================================================================================
 
+  Widget buildChatDrawerTopo() {
+    return ScopedModelDescendant<ChatModel>(
+      builder: (context, child, model) {
+        return Container(
+          height: 100.0,
+          child: DrawerHeader(
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                '${_meusUsuarios?.length ?? 0}' + ' - Usuários ativos em "' + widget.salaChat + '"',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+            decoration: BoxDecoration(color: Colors.blue.shade400),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget buildChatDrawerItens() {
+    return ScopedModelDescendant<ChatModel>(
+      builder: (context, child, model) {
+        return Container(
+          padding: EdgeInsets.all(10.0),
+          height: MediaQuery.of(context).size.height * 0.75,
+          child: ListView.builder(
+            itemCount: _meusUsuarios?.length ?? 0,
+            itemBuilder: (BuildContext context, int index) {
+              return buildSingleUser(_meusUsuarios[index]);
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  //=================================================================================================
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -160,6 +201,8 @@ class _TelaChatState extends State<TelaChat> {
               icon: new Icon(Icons.exit_to_app),
               tooltip: 'Sair do Chat',
               onPressed: () {
+                _meusUsuarios.clear();
+                _minhasMensagens.clear();
                 _channel.destroySocket();
                 Navigator.pop(context);
               })
@@ -169,29 +212,8 @@ class _TelaChatState extends State<TelaChat> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-            Container(
-              height: 100.0,
-              child: DrawerHeader(
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    '${_meusUsuarios?.length ?? 0}' + ' - Usuários ativos em "' + widget.salaChat + '"',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-                decoration: BoxDecoration(color: Colors.blue.shade400),
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.all(10.0),
-              height: MediaQuery.of(context).size.height * 0.75,
-              child: ListView.builder(
-                itemCount: _meusUsuarios?.length ?? 0,
-                itemBuilder: (BuildContext context, int index) {
-                  return buildSingleUser(_meusUsuarios[index]);
-                },
-              ),
-            ),
+            buildChatDrawerTopo(),
+            buildChatDrawerItens(),
           ],
         ),
       ),
