@@ -24,19 +24,26 @@ class SocketControl {
       switch (data['info']) {
         case 'chat_update_status':
           {
-            if (chatModel != null) {
-              if (this.meuId == '') {
-                this.meuId = data['clientId'];
-                chatModel.adicionaSala('Geral');
-                chatModel.adicionaUsuario({'nome': this.nomeUsuario, 'clientId': this.meuId, 'sala': 'Geral'});
-              }
-              chatModel.atualizaPontas('Geral');
+            if (this.meuId == '' || this.meuId == null) {
+              this.meuId = data['clientId'];
+            }
+          }
+          break;
+
+        case 'chat_users_inside':
+          {
+            if (this.chatModel != null) {
+              print("===============================");
+              print("data['sala']");
+              print(data['sala']);
+              print(data['usuarios']);
+              this.chatModel.adicionaSala(data['sala']);
+              this.chatModel.atualizaUsuarios(data['usuarios'], data['sala']);
             }
           }
           break;
         case 'chat_share_message':
           {
-            chatModel.adicionaUsuario({'nome': data['nome'], 'clientId': data['clientId'], 'sala': 'Geral'});
             recebeMensagem(data);
           }
           break;
@@ -50,8 +57,6 @@ class SocketControl {
     if (this.socket != null) {
       Map<String, dynamic> decoded = jsonDecode(jsonData);
       final minhaData = new DateFormat.yMd().add_Hm().format(DateTime.now());
-      print("minhaData = ");
-      print(minhaData);
       this.socket.sink.add(json.encode({'info': 'chat_send_message', 'sala': 'Geral', 'mensagem': decoded['mensagem'], 'momento': minhaData, 'clientId': this.meuId}));
     }
   }
@@ -59,7 +64,7 @@ class SocketControl {
   void recebeMensagem(jsonData) {
     print("Recebi uma mensagem do Chat de fora");
     print(jsonData);
-    if (chatModel != null) chatModel.adicionaMensagem(jsonData);
+    if (this.chatModel != null) this.chatModel.adicionaMensagem(jsonData);
   }
 
   //...............................................................................................................................
@@ -72,8 +77,8 @@ class SocketControl {
 
   destroySocket() {
     if (this.socket != null) {
-      chatModel.salas.clear();
-      chatModel.listaAmigos.clear();
+      this.chatModel.salas.clear();
+      this.chatModel.listaAmigos.clear();
       this.socket.sink.close();
     }
   }

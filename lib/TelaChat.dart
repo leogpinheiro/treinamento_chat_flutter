@@ -43,7 +43,6 @@ class _TelaChatState extends State<TelaChat> {
 
   Widget buildSingleMessage(Mensagem mensagem) {
     bool souEu = mensagem.clientId == _channel.meuId;
-    Usuario usuarioAutor = _meusUsuarios.firstWhere((usuario) => usuario.idUsuario == mensagem.clientId);
 
     return Container(
       decoration: BoxDecoration(
@@ -62,7 +61,7 @@ class _TelaChatState extends State<TelaChat> {
         children: <Widget>[
           RichText(
               text: TextSpan(
-            text: souEu ? 'Eu' : usuarioAutor.nomeUsuario,
+            text: souEu ? 'Eu' : mensagem.clientNome,
             style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54),
             children: <TextSpan>[
               TextSpan(
@@ -87,7 +86,8 @@ class _TelaChatState extends State<TelaChat> {
 
   Widget buildSingleUser(Usuario usuario) {
     print("usuario na lista");
-    print(usuario);
+    print(usuario.idUsuario);
+    print(usuario.nomeUsuario);
     bool souEu = usuario.idUsuario == _channel.meuId;
     return ListTile(
       title: Text(
@@ -103,7 +103,6 @@ class _TelaChatState extends State<TelaChat> {
     return ScopedModelDescendant<ChatModel>(
       builder: (context, child, model) {
         _channel.chatModel = model;
-        model.idAtual = _channel.meuId;
         _minhasMensagens = model.pegaMensagensNaSala(widget.salaChat);
         _meusUsuarios = model.pegaUsuariosNaSala(widget.salaChat);
         return Container(
