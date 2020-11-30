@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'SocketControl.dart';
@@ -42,7 +40,7 @@ class _TelaChatState extends State<TelaChat> {
 //=================================================================================================
 
   Widget buildSingleMessage(Mensagem mensagem) {
-    bool souEu = mensagem.clientId == _channel.meuId;
+    bool souEu = mensagem.clientId == _channel.meuUsuario.idUsuario;
 
     return Container(
       decoration: BoxDecoration(
@@ -74,7 +72,7 @@ class _TelaChatState extends State<TelaChat> {
           )),
           SizedBox(height: 10.0),
           Text(
-            mensagem.mensagem,
+            mensagem?.mensagem ?? '',
             textAlign: souEu ? TextAlign.left : TextAlign.right,
           ),
         ],
@@ -84,14 +82,19 @@ class _TelaChatState extends State<TelaChat> {
 
 //=================================================================================================
 
-  Widget buildSingleUser(Usuario usuario) {
-    print("usuario na lista");
-    print(usuario.idUsuario);
-    print(usuario.nomeUsuario);
-    bool souEu = usuario.idUsuario == _channel.meuId;
+  Widget buildSingleUser(Usuario usuarioItem) {
+    bool souEu = usuarioItem.idUsuario == _channel.meuUsuario.idUsuario;
     return ListTile(
+      onTap: () {
+        Usuario usuarioAlvo = _meusUsuarios.firstWhere((usuario) => usuario.idUsuario == usuarioItem.idUsuario);
+        String salaDestino = _channel.meuUsuario.idUsuario + "+" + usuarioAlvo.idUsuario;
+        _channel.chatModel.trocaDeSala(_channel.meuUsuario, widget.salaChat, salaDestino);
+        _minhasMensagens.clear();
+        _trocaMeDeSala(usuarioItem.nomeUsuario, salaDestino);
+        Navigator.pop(context);
+      },
       title: Text(
-        souEu ? 'Eu' : usuario.nomeUsuario,
+        souEu ? 'Eu' : usuarioItem.nomeUsuario,
         style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
       ),
     );
@@ -227,9 +230,19 @@ class _TelaChatState extends State<TelaChat> {
 
   //=================================================================================================
 
+  void _trocaMeDeSala(nomeAmigo, salaDestino) {
+    print('\n\n salaDestino :');
+    print(salaDestino);
+    _channel.trocaDeSala(json.encode({'info': 'chat_change_sala', 'clientId': _channel.meuUsuario.idUsuario, 'nome': widget.nomeMeuUsuario, 'nomeAmigo': nomeAmigo, 'sala': salaDestino}));
+  }
+
+  //=================================================================================================
+
   void _sendMessage(model) {
     if (textEditingController.text.isNotEmpty) {
-      _channel.enviaMensagem(json.encode({'mensagem': textEditingController.text, 'clientId': _channel.meuId}));
+      print('\n\n Enviando mensagem para a sala');
+      print(_channel.salaAtual);
+      _channel.enviaMensagem(json.encode({'mensagem': textEditingController.text, 'clientId': _channel.meuUsuario.idUsuario, 'sala': _channel.salaAtual}));
       _atualizaLista(model);
     }
   }
