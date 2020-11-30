@@ -8,9 +8,8 @@ import 'Usuario.dart';
 
 //=================================================================================================
 class TelaChat extends StatefulWidget {
-  final String salaChat;
   final String nomeMeuUsuario;
-  TelaChat(this.nomeMeuUsuario, this.salaChat);
+  TelaChat(this.nomeMeuUsuario);
 
   @override
   _TelaChatState createState() => _TelaChatState();
@@ -22,6 +21,7 @@ class _TelaChatState extends State<TelaChat> {
   List<Mensagem> _minhasMensagens;
   List<Usuario> _meusUsuarios;
   SocketControl _channel;
+  String salaChat = 'Geral';
 
   @override
   void initState() {
@@ -32,8 +32,10 @@ class _TelaChatState extends State<TelaChat> {
 
   void _atualizaLista(model) {
     setState(() {
-      _minhasMensagens = model.pegaMensagensNaSala(widget.salaChat);
-      _meusUsuarios = model.pegaUsuariosNaSala(widget.salaChat);
+      print('Atualizando lista de mensagens de: ');
+      print(salaChat);
+      _minhasMensagens = model.pegaMensagensNaSala(salaChat);
+      _meusUsuarios = model.pegaUsuariosNaSala(salaChat);
     });
   }
 
@@ -88,9 +90,10 @@ class _TelaChatState extends State<TelaChat> {
       onTap: () {
         Usuario usuarioAlvo = _meusUsuarios.firstWhere((usuario) => usuario.idUsuario == usuarioItem.idUsuario);
         String salaDestino = _channel.meuUsuario.idUsuario + "+" + usuarioAlvo.idUsuario;
-        _channel.chatModel.trocaDeSala(_channel.meuUsuario, widget.salaChat, salaDestino);
+        _channel.chatModel.trocaDeSala(_channel.meuUsuario, salaChat, salaDestino);
         _minhasMensagens.clear();
-        _trocaMeDeSala(usuarioItem.nomeUsuario, salaDestino);
+        salaChat = salaDestino;
+        _trocaMeDeSala(usuarioItem.nomeUsuario, salaChat);
         Navigator.pop(context);
       },
       title: Text(
@@ -106,8 +109,8 @@ class _TelaChatState extends State<TelaChat> {
     return ScopedModelDescendant<ChatModel>(
       builder: (context, child, model) {
         _channel.chatModel = model;
-        _minhasMensagens = model.pegaMensagensNaSala(widget.salaChat);
-        _meusUsuarios = model.pegaUsuariosNaSala(widget.salaChat);
+        _minhasMensagens = model.pegaMensagensNaSala(salaChat);
+        _meusUsuarios = model.pegaUsuariosNaSala(salaChat);
         return Container(
           padding: EdgeInsets.all(10.0),
           height: MediaQuery.of(context).size.height * 0.75,
@@ -163,7 +166,7 @@ class _TelaChatState extends State<TelaChat> {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                '${_meusUsuarios?.length ?? 0}' + ' - Usuários ativos em "' + widget.salaChat + '"',
+                '${_meusUsuarios?.length ?? 0}' + ' - Usuários ativos em "' + salaChat + '"',
                 style: TextStyle(color: Colors.white),
               ),
             ),

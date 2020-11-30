@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:intl/intl.dart';
 import 'package:web_socket_channel/io.dart';
 import 'ChatModel.dart';
@@ -49,7 +50,7 @@ class SocketControl {
 
         case 'chat_share_message':
           {
-            recebeMensagem(data);
+            if (data['sala'] == salaAtual) recebeMensagem(data);
           }
           break;
 
@@ -68,8 +69,10 @@ class SocketControl {
             print("2");
             final usuarioDestinatario = usuariosAlvo[1];
             print("3");
-            final mensagens = data['mensagens'];
-            print("4");
+            final mensagens = json.decode(json.encode(data['mensagens']));
+            print("mensagens:");
+            print(mensagens);
+            inspect(mensagens);
 
             if (data['ordem'].contains(meuId)) {
               print("Algum usuário trocou de sala com sucesso = " + usuarioRemetente);
@@ -80,14 +83,16 @@ class SocketControl {
               } else if (usuarioRemetente == meuId) {
                 salaAtual = data['sala'];
                 print("Mudei para a sala = " + salaAtual);
-                mensagens.forEach((mensagem) => {chatModel.adicionaMensagem(mensagem)});
+                if (mensagens.length > 0) mensagens.forEach((mensagem) => {chatModel.adicionaMensagem(mensagem)});
               }
             } else {
               salaAtual = salaGeral;
               //sufixo = 'na sala ' + salaGeral;
-              mensagens.forEach((mensagem) => {chatModel.adicionaMensagem(mensagem)});
+              if (mensagens.length > 0) mensagens.forEach((mensagem) => {chatModel.adicionaMensagem(mensagem)});
             }
           }
+          print('salaAtual:');
+          print(salaAtual);
           break;
       }
     });
@@ -113,9 +118,13 @@ class SocketControl {
   }
 
   void recebeMensagem(jsonData) {
-    print("Recebi uma mensagem do Chat de fora");
+    print("\n\n>>>>>>>> Recebi uma mensagem do Chat de fora <<<<<<<<< em \n");
+    print(salaAtual);
     print(jsonData);
-    if (this.chatModel != null) this.chatModel.adicionaMensagem(jsonData);
+    if (this.chatModel != null) {
+      print('Adicionando mensagem');
+      this.chatModel.adicionaMensagem(jsonData);
+    }
   }
 
   //...............................................................................................................................

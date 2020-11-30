@@ -13,7 +13,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController myTextController = TextEditingController();
 
   void goToMainPage(String nomeUsuario, BuildContext context) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => TelaChat(nomeUsuario, 'Geral')));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => TelaChat(nomeUsuario)));
   }
 
   @override
