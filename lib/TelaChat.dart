@@ -88,12 +88,14 @@ class _TelaChatState extends State<TelaChat> {
     bool souEu = usuarioItem.idUsuario == _channel.meuUsuario.idUsuario;
     return ListTile(
       onTap: () {
-        Usuario usuarioAlvo = _meusUsuarios.firstWhere((usuario) => usuario.idUsuario == usuarioItem.idUsuario);
-        String salaDestino = _channel.meuUsuario.idUsuario + "+" + usuarioAlvo.idUsuario;
-        _channel.chatModel.trocaDeSala(_channel.meuUsuario, salaChat, salaDestino);
-        _minhasMensagens.clear();
-        salaChat = salaDestino;
-        _trocaMeDeSala(usuarioItem.nomeUsuario, salaChat);
+        if (!souEu) {
+          Usuario usuarioAlvo = _meusUsuarios.firstWhere((usuario) => usuario.idUsuario == usuarioItem.idUsuario);
+          String salaDestino = _channel.meuUsuario.idUsuario + "+" + usuarioAlvo.idUsuario;
+          _channel.chatModel.trocaDeSala(_channel.meuUsuario, salaChat, salaDestino);
+          _minhasMensagens.clear();
+          salaChat = salaDestino;
+          _trocaMeDeSala(usuarioItem.nomeUsuario, salaChat);
+        }
         Navigator.pop(context);
       },
       title: Text(
