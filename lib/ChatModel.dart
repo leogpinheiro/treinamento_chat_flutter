@@ -1,19 +1,68 @@
+import 'dart:convert';
+import 'constants.dart' as Constants;
+import 'package:localstorage/localstorage.dart';
 import 'package:scoped_model/scoped_model.dart';
-import './Usuario.dart';
-import './Sala.dart';
-import './Mensagem.dart';
+import 'Objetos/Usuario.dart';
+import 'Objetos/Sala.dart';
+import 'Objetos/Mensagem.dart';
 
 class ChatModel extends Model {
-  List<Usuario> listaAmigos = List<Usuario>();
   List<Sala> salas = List<Sala>();
+  final LocalStorage storage = new LocalStorage(Constants.LOCALSTORAGE_DAFEULT);
 
-  //=============================================================================================================================
+//=============================================================================================================================
 
   void init() {
     adicionaSala('Geral');
   }
 
-  //=============================================================================================================================
+//=============================================================================================================================
+
+  void storageSetUsuario(Usuario usuarioAlvo) {
+    final String meuJson = json.encode({'id': usuarioAlvo.idUsuario, 'nome': usuarioAlvo.nomeUsuario});
+    print('\n meuJson:');
+    print(meuJson);
+
+    storage.setItem('usuario', meuJson);
+    print('\n\n Cheguei aqui usuario \n\n');
+  }
+
+  //................................................................................................................................
+
+  void storageSetSalas(List<Sala> salasAlvo) {
+//
+    //final List<Sala> minhasSalas = new List<Sala>.from([...salasAlvo]);
+    //final Map mapaUsuarios = {};
+    //final Map mapaMensagens = {};
+//
+    /*
+    minhasSalas.forEach((sala) {
+      final qtdMensagens = sala.mensagens.length;
+      final indiceMinimo = max(0, qtdMensagens - 10);
+      final mensagensRangeAlvo = new List<Mensagem>.from(sala.mensagens.getRange(indiceMinimo, qtdMensagens));
+      sala.mensagens = mensagensRangeAlvo;
+      sala.jsonMensagens = jsonEncode(mensagensRangeAlvo);
+    });
+
+    storage.deleteItem('salas');
+    storage.setItem('salas', jsonEncode(minhasSalas));
+    */
+    salas = salasAlvo;
+  }
+
+  //................................................................................................................................
+
+  storageGetUsuario() {
+    return storage.getItem('usuario');
+  }
+
+  //................................................................................................................................
+
+  void storageUpdateSalas() {
+    salas = json.decode(storage.getItem('salas'))?.toList() ?? salas;
+  }
+
+//=============================================================================================================================
 
   void atualizaUsuarios(usuarios, String nomeSalaAlvo) {
     Sala salaAtual = salas.firstWhere((sala) => sala.nome == nomeSalaAlvo);
@@ -28,7 +77,7 @@ class ChatModel extends Model {
     notifyListeners();
   }
 
-  //=============================================================================================================================
+//=============================================================================================================================
 
   checaSalaExiste(String nomeSala) {
     bool retorno = false;
@@ -43,9 +92,11 @@ class ChatModel extends Model {
     if (!checaSalaExiste(nomeSala)) {
       salas.add(instanciaSala);
     }
+    print('\n\n Cheguei aqui 1 \n\n');
+    storageSetSalas(salas);
   }
 
-  //=============================================================================================================================
+//=============================================================================================================================
 
   void adicionaMensagem(dados) {
     Mensagem instanciaMensagem = new Mensagem(dados['sala'], dados['mensagem'], dados['momento'], dados['clientId'], dados['nome']);
@@ -56,7 +107,7 @@ class ChatModel extends Model {
     notifyListeners();
   }
 
-  //=============================================================================================================================
+//=============================================================================================================================
 
   List<Mensagem> pegaMensagensNaSala(String nomeSala) {
     if (salas != null && salas.length > 0) {
@@ -73,7 +124,7 @@ class ChatModel extends Model {
     }
   }
 
-  //=============================================================================================================================
+//=============================================================================================================================
 
   List<Usuario> pegaUsuariosNaSala(String nomeSala) {
     if (salas != null && salas.length > 0) {
@@ -84,7 +135,7 @@ class ChatModel extends Model {
     }
   }
 
-  //=============================================================================================================================
+//=============================================================================================================================
 
   void trocaDeSala(Usuario usuarioAlvo, String nomeSalaAtual, String nomeSalaAlvo) {
     //Sala salaAtual = salas.firstWhere((sala) => sala.nome == nomeSalaAtual);
@@ -97,5 +148,5 @@ class ChatModel extends Model {
     notifyListeners();
   }
 
-  //=============================================================================================================================
+//=============================================================================================================================
 }

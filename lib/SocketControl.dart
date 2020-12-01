@@ -1,36 +1,48 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:intl/intl.dart';
 import 'package:web_socket_channel/io.dart';
 import 'ChatModel.dart';
-import 'Usuario.dart';
+import 'Objetos/Usuario.dart';
 
 class SocketControl {
   //
+  final String nomeUsuario;
+  final String idPrevio;
+  final String salaGeral = 'Geral';
   IOWebSocketChannel socket;
   Usuario meuUsuario;
-  String nomeUsuario;
-  final String salaGeral = 'Geral';
   String salaAtual;
   ChatModel chatModel;
 
   //...............................................................................................................................
 
-  SocketControl(this.nomeUsuario) {
-    print(">>>>>>>>> Fui chamado");
+  SocketControl(this.nomeUsuario, this.idPrevio) {
+//
     this.socket = IOWebSocketChannel.connect('ws://192.168.0.179:3000');
     this.salaAtual = salaGeral;
-    this.socket.sink.add(json.encode({'info': 'chat_join_room', 'nome': this.nomeUsuario, 'sala': 'Geral'}));
+    if (idPrevio != null) {
+      this.socket.sink.add(json.encode({'info': 'chat_join_room', 'nome': this.nomeUsuario, 'sala': 'Geral', 'clientId': idPrevio}));
+    } else {
+      this.socket.sink.add(json.encode({'info': 'chat_join_room', 'nome': this.nomeUsuario, 'sala': 'Geral'}));
+    }
 
     this.socket.stream.listen((message) {
+//
       print("\n\n>>>>>> Messagem recebida:");
       print(message);
+//
       Map<String, dynamic> data = json.decode(message);
+//
       switch (data['info']) {
+//
         case 'chat_update_status':
           {
             if (this.meuUsuario == null) {
               this.meuUsuario = new Usuario(data['nome'], data['clientId'], data['sala']);
+              print('\n meuUsuario id');
+              print(data['clientId']);
+              print('\n');
+              if (this.chatModel != null) this.chatModel.storageSetUsuario(this.meuUsuario);
             }
           }
           break;
@@ -38,10 +50,6 @@ class SocketControl {
         case 'chat_users_inside':
           {
             if (this.chatModel != null) {
-              print("===============================");
-              print("data['sala']");
-              print(data['sala']);
-              print(data['usuarios']);
               this.chatModel.adicionaSala(data['sala']);
               this.chatModel.atualizaUsuarios(data['usuarios'], data['sala']);
             }
@@ -64,18 +72,14 @@ class SocketControl {
 
             if (data['ordem'].contains(meuId)) {
               final usuariosAlvo = data['ordem'].split("+");
-              print("1");
               final usuarioRemetente = usuariosAlvo[0];
-              print("2");
               final usuarioDestinatario = usuariosAlvo[1];
-              print("3");
 
               if (usuarioDestinatario == meuId) {
                 //$('#listaNome_' + usuarioRemetente).addClass('newmessage');
 
               } else if (usuarioRemetente == meuId) {
                 salaAtual = data['sala'];
-                print("Mudei para a sala = " + salaAtual);
                 if (mensagens.length > 0) mensagens.forEach((mensagem) => {chatModel.adicionaMensagem(mensagem)});
               }
             } else {
@@ -129,7 +133,6 @@ class SocketControl {
   destroySocket() {
     if (this.socket != null) {
       this.chatModel.salas.clear();
-      this.chatModel.listaAmigos.clear();
       this.socket.sink.close();
     }
   }

@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'SocketControl.dart';
-import 'Mensagem.dart';
+import 'Objetos/Mensagem.dart';
 import 'ChatModel.dart';
 import 'dart:convert';
-import 'Usuario.dart';
+import 'Objetos/Usuario.dart';
 
 //=================================================================================================
 class TelaChat extends StatefulWidget {
   final String nomeMeuUsuario;
-  TelaChat(this.nomeMeuUsuario);
+  final idMeuUsuario;
+  TelaChat(this.nomeMeuUsuario, this.idMeuUsuario);
 
   @override
   _TelaChatState createState() => _TelaChatState();
@@ -28,7 +29,7 @@ class _TelaChatState extends State<TelaChat> {
   void initState() {
     super.initState();
     ScopedModel.of<ChatModel>(context, rebuildOnChange: false).init();
-    _channel = new SocketControl(widget.nomeMeuUsuario);
+    _channel = new SocketControl(widget.nomeMeuUsuario, widget.idMeuUsuario);
   }
 
   void _atualizaLista(model) {
