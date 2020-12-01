@@ -58,15 +58,11 @@ class SocketControl {
         case 'chat_changing_room':
           {
             final meuId = meuUsuario.idUsuario;
-            final mensagens = json.decode(json.encode(data['mensagens']));
 
             print("Usuário trocando de sala para " + data['sala']);
+            final mensagens = json.decode(json.encode(data['mensagens']));
 
-            if (data['ordem'] && data['ordem'].contains(meuId)) {
-              print("data['ordem'] = " + data['ordem']);
-              print("meuId: ");
-              print(meuId);
-
+            if (data['ordem'].contains(meuId)) {
               final usuariosAlvo = data['ordem'].split("+");
               print("1");
               final usuarioRemetente = usuariosAlvo[0];
@@ -79,6 +75,7 @@ class SocketControl {
 
               } else if (usuarioRemetente == meuId) {
                 salaAtual = data['sala'];
+                print("Mudei para a sala = " + salaAtual);
                 if (mensagens.length > 0) mensagens.forEach((mensagem) => {chatModel.adicionaMensagem(mensagem)});
               }
             } else {
@@ -86,7 +83,6 @@ class SocketControl {
               //sufixo = 'na sala ' + salaGeral;
               if (mensagens.length > 0) mensagens.forEach((mensagem) => {chatModel.adicionaMensagem(mensagem)});
             }
-            print("Mudei para a salaAtual = " + salaAtual);
           }
           break;
       }
