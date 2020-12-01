@@ -50,7 +50,8 @@ class SocketControl {
 
         case 'chat_share_message':
           {
-            if (data['sala'] == salaAtual) recebeMensagem(data);
+            //if (data['sala'] == salaAtual) recebeMensagem(data);
+            recebeMensagem(data);
           }
           break;
 

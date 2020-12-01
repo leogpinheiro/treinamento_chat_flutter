@@ -30,9 +30,17 @@ class ChatModel extends Model {
 
   //=============================================================================================================================
 
+  checaSalaExiste(String nomeSala) {
+    bool retorno = false;
+    salas.forEach((sala) {
+      if (sala.nome == nomeSala) retorno = true;
+    });
+    return retorno;
+  }
+
   void adicionaSala(String nomeSala) {
     Sala instanciaSala = new Sala(nomeSala);
-    if (!salas.contains(instanciaSala)) {
+    if (!checaSalaExiste(nomeSala)) {
       salas.add(instanciaSala);
     }
   }
