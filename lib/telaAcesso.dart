@@ -19,25 +19,44 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text(widget.title),
+          title: Text(
+            widget.title,
+            style: TextStyle(color: Colors.black),
+          ),
+          backgroundColor: Color(0xfffae800),
         ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text('Seja bem-vindo ao chat!'),
-              TextField(
+              TextFormField(
                 controller: myTextController,
-                decoration: InputDecoration(labelText: "Nome"),
-                //onSubmitted: (nomeUsuario) => goToMainPage(nomeUsuario, context),
+                style: TextStyle(color: Colors.black),
+                decoration: InputDecoration(
+                  labelText: "Nome",
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black38),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black),
+                  ),
+                  fillColor: Colors.black,
+                  hoverColor: Colors.black,
+                  focusColor: Colors.black,
+                ),
               ),
             ],
           ),
         ),
         floatingActionButton: FloatingActionButton(
+          backgroundColor: Color(0xfffae800),
           onPressed: () => goToMainPage(myTextController.text, context),
           tooltip: 'Acessar',
-          child: Icon(Icons.arrow_forward),
+          child: Icon(
+            Icons.arrow_forward,
+            color: Colors.black,
+          ),
         ),
       );
 }

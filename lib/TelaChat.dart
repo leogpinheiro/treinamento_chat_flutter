@@ -47,7 +47,7 @@ class _TelaChatState extends State<TelaChat> {
 
     return Container(
       decoration: BoxDecoration(
-        color: souEu ? Colors.blue.shade100 : Colors.green.shade100,
+        color: souEu ? Color(0xffeeeeee) : Color(0xfffff670),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(30.0),
           topRight: Radius.circular(30.0),
@@ -173,9 +173,9 @@ class _TelaChatState extends State<TelaChat> {
               children: <Widget>[
                 Text(
                   enunciado,
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: Colors.black),
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 15),
                 DecoratedBox(
                   decoration: BoxDecoration(
                     shape: BoxShape.rectangle,
@@ -183,7 +183,7 @@ class _TelaChatState extends State<TelaChat> {
                     borderRadius: BorderRadius.all(Radius.circular(6.0)),
                   ),
                   child: TextButton(
-                    child: Text("Sala Geral"),
+                    child: Text("Sala Geral", style: TextStyle(color: Colors.black)),
                     onPressed: () {
                       salaChat = 'Geral';
                       _trocaMeDeSala('Geral', salaChat);
@@ -193,7 +193,7 @@ class _TelaChatState extends State<TelaChat> {
                 ),
               ],
             ),
-            decoration: BoxDecoration(color: Colors.blue.shade400),
+            decoration: BoxDecoration(color: Color(0xfffae800)),
           ),
         );
       },
@@ -223,7 +223,11 @@ class _TelaChatState extends State<TelaChat> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.nomeMeuUsuario),
+        title: Text(
+          widget.nomeMeuUsuario,
+          style: TextStyle(color: Colors.black),
+        ),
+        backgroundColor: Color(0xfffae800),
         actions: [
           IconButton(
               icon: new Icon(Icons.exit_to_app),
