@@ -22,6 +22,7 @@ class _TelaChatState extends State<TelaChat> {
   List<Usuario> _meusUsuarios;
   SocketControl _channel;
   String salaChat = 'Geral';
+  String amigoAtual;
 
   @override
   void initState() {
@@ -89,6 +90,7 @@ class _TelaChatState extends State<TelaChat> {
     return ListTile(
       onTap: () {
         if (!souEu) {
+          amigoAtual = usuarioItem.nomeUsuario;
           Usuario usuarioAlvo = _meusUsuarios.firstWhere((usuario) => usuario.idUsuario == usuarioItem.idUsuario);
           String salaDestino = _channel.meuUsuario.idUsuario + "+" + usuarioAlvo.idUsuario;
           _channel.chatModel.trocaDeSala(_channel.meuUsuario, salaChat, salaDestino);
@@ -162,15 +164,34 @@ class _TelaChatState extends State<TelaChat> {
   Widget buildChatDrawerTopo() {
     return ScopedModelDescendant<ChatModel>(
       builder: (context, child, model) {
+        String enunciado = salaChat.contains('+') ? 'Conversando com ' + amigoAtual : '${_meusUsuarios?.length ?? 0}' + ' - Usuários ativos em "' + salaChat + '"';
         return Container(
-          height: 100.0,
+          height: 154.0,
           child: DrawerHeader(
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                '${_meusUsuarios?.length ?? 0}' + ' - Usuários ativos em "' + salaChat + '"',
-                style: TextStyle(color: Colors.white),
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  enunciado,
+                  style: TextStyle(color: Colors.white),
+                ),
+                SizedBox(height: 10),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.rectangle,
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(6.0)),
+                  ),
+                  child: TextButton(
+                    child: Text("Sala Geral"),
+                    onPressed: () {
+                      salaChat = 'Geral';
+                      _trocaMeDeSala('Geral', salaChat);
+                      _atualizaLista(model);
+                    },
+                  ),
+                ),
+              ],
             ),
             decoration: BoxDecoration(color: Colors.blue.shade400),
           ),

@@ -52,7 +52,13 @@ class ChatModel extends Model {
 
   List<Mensagem> pegaMensagensNaSala(String nomeSala) {
     if (salas != null && salas.length > 0) {
-      Sala nomeSalaAlvo = salas.firstWhere((sala) => sala.nome == nomeSala);
+      print('Sala nome alvo:');
+      print(nomeSala);
+      salas.forEach((sala) {
+        print('Sala nome item:');
+        print(sala.nome);
+      });
+      Sala nomeSalaAlvo = salas?.firstWhere((sala) => sala.nome == nomeSala);
       return nomeSalaAlvo?.mensagens?.toList();
     } else {
       return null;
