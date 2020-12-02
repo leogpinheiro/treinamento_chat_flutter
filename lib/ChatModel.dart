@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'constants.dart' as Constants;
 import 'package:localstorage/localstorage.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'Objetos/Usuario.dart';
@@ -8,7 +7,7 @@ import 'Objetos/Mensagem.dart';
 
 class ChatModel extends Model {
   List<Sala> salas = List<Sala>();
-  final LocalStorage storage = new LocalStorage(Constants.LOCALSTORAGE_DAFEULT);
+  LocalStorage myLocalStorage;
 
 //=============================================================================================================================
 
@@ -23,18 +22,16 @@ class ChatModel extends Model {
     print('\n meuJson:');
     print(meuJson);
 
-    storage.setItem('usuario', meuJson);
+    myLocalStorage.setItem('usuario', meuJson);
     print('\n\n Cheguei aqui usuario \n\n');
   }
 
   //................................................................................................................................
 
   void storageSetSalas(List<Sala> salasAlvo) {
-//
     //final List<Sala> minhasSalas = new List<Sala>.from([...salasAlvo]);
     //final Map mapaUsuarios = {};
     //final Map mapaMensagens = {};
-//
     /*
     minhasSalas.forEach((sala) {
       final qtdMensagens = sala.mensagens.length;
@@ -44,8 +41,8 @@ class ChatModel extends Model {
       sala.jsonMensagens = jsonEncode(mensagensRangeAlvo);
     });
 
-    storage.deleteItem('salas');
-    storage.setItem('salas', jsonEncode(minhasSalas));
+    myLocalStorage.deleteItem('salas');
+    myLocalStorage.setItem('salas', jsonEncode(minhasSalas));
     */
     salas = salasAlvo;
   }
@@ -53,13 +50,13 @@ class ChatModel extends Model {
   //................................................................................................................................
 
   storageGetUsuario() {
-    return storage.getItem('usuario');
+    return myLocalStorage.getItem('usuario');
   }
 
   //................................................................................................................................
 
   void storageUpdateSalas() {
-    salas = json.decode(storage.getItem('salas'))?.toList() ?? salas;
+    salas = json.decode(myLocalStorage.getItem('salas'))?.toList() ?? salas;
   }
 
 //=============================================================================================================================

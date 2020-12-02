@@ -10,7 +10,8 @@ import 'Objetos/Usuario.dart';
 class TelaChat extends StatefulWidget {
   final String nomeMeuUsuario;
   final idMeuUsuario;
-  TelaChat(this.nomeMeuUsuario, this.idMeuUsuario);
+  final myLocalStorage;
+  TelaChat(this.nomeMeuUsuario, this.idMeuUsuario, this.myLocalStorage);
 
   @override
   _TelaChatState createState() => _TelaChatState();
@@ -113,6 +114,7 @@ class _TelaChatState extends State<TelaChat> {
   Widget buildChatList() {
     return ScopedModelDescendant<ChatModel>(
       builder: (context, child, model) {
+        model.myLocalStorage = widget.myLocalStorage;
         _channel.chatModel = model;
         _minhasMensagens = model.pegaMensagensNaSala(salaChat);
         _meusUsuarios = model.pegaUsuariosNaSala(salaChat);

@@ -23,13 +23,14 @@ class _MyHomePageState extends State<MyHomePage> {
 //========================================================================================================================================
 
   void goToMainPage(String nomeUsuario, BuildContext context) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => TelaChat(nomeUsuario, idUsuarioAlvo)));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => TelaChat(nomeUsuario, idUsuarioAlvo, storage)));
   }
 
 //========================================================================================================================================
 
   Future<bool> localstoragePronto() async {
-    return await storage.ready;
+    final bool estouPronto = await storage.ready;
+    return estouPronto;
   }
 
 //========================================================================================================================================
@@ -81,13 +82,21 @@ class _MyHomePageState extends State<MyHomePage> {
 
 //========================================================================================================================================
 
-  Widget carregando() {
+  Widget telaCarregamento(bool redireciona, String nomeUsuarioAlvo) {
+    Future.delayed(const Duration(seconds: 2), () => {redireciona ? goToMainPage(nomeUsuarioAlvo, context) : null});
     return Scaffold(
       body: Center(
         child: Container(
-          child: Text(
-            'Carregando...',
-            style: TextStyle(color: Colors.black),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text("- Carregando -"),
+              SizedBox(height: 10.0),
+              Text(redireciona ? "Entrando no chat na sala Geral" : "Abrindo tela de acesso"),
+              SizedBox(height: 30.0),
+              CircularProgressIndicator(),
+            ],
           ),
         ),
       ),
@@ -98,29 +107,35 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-//
-    localstoragePronto().then((retorno) {
-//
-      usuarioAlvo = storage.getItem('usuario');
+    return Container(
+      child: FutureBuilder(
+        future: localstoragePronto(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            if (snapshot.data == true) {
+              usuarioAlvo = storage.getItem('usuario');
 
-      if (usuarioAlvo != null) {
-        idUsuarioAlvo = json.decode(usuarioAlvo)['id'];
-        String nomeUsuarioAlvo = json.decode(usuarioAlvo)['nome'];
+              if (usuarioAlvo != null) {
+                idUsuarioAlvo = json.decode(usuarioAlvo)['id'];
+                String nomeUsuarioAlvo = json.decode(usuarioAlvo)['nome'];
 
-        print('\n idUsuarioAlvo \n');
-        print(idUsuarioAlvo);
-        print('\n nomeUsuarioAlvo \n');
-        print(nomeUsuarioAlvo);
+                print('\n idUsuarioAlvo \n');
+                print(idUsuarioAlvo);
+                print('\n nomeUsuarioAlvo \n');
+                print(nomeUsuarioAlvo);
 
-        goToMainPage(nomeUsuarioAlvo, context);
-        return null;
-//
-      } else {
-        return telaDeAcesso();
-      }
-    }, onError: (error) {
-      return telaDeAcesso();
-    });
-    return carregando();
+                return telaCarregamento(true, nomeUsuarioAlvo);
+              } else {
+                return telaDeAcesso();
+              }
+            } else {
+              return telaDeAcesso();
+            }
+          } else {
+            return telaCarregamento(false, '');
+          }
+        },
+      ),
+    );
   }
 }
