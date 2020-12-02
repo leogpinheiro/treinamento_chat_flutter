@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:localstorage/localstorage.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'SocketControl.dart';
 import 'Objetos/Mensagem.dart';
@@ -10,7 +11,7 @@ import 'Objetos/Usuario.dart';
 class TelaChat extends StatefulWidget {
   final String nomeMeuUsuario;
   final idMeuUsuario;
-  final myLocalStorage;
+  final LocalStorage myLocalStorage;
   TelaChat(this.nomeMeuUsuario, this.idMeuUsuario, this.myLocalStorage);
 
   @override
@@ -20,6 +21,7 @@ class TelaChat extends StatefulWidget {
 //=================================================================================================
 class _TelaChatState extends State<TelaChat> {
   final TextEditingController textEditingController = TextEditingController();
+  LocalStorage meuStorage;
   List<Mensagem> _minhasMensagens;
   List<Usuario> _meusUsuarios;
   SocketControl _channel;
@@ -31,6 +33,7 @@ class _TelaChatState extends State<TelaChat> {
     super.initState();
     ScopedModel.of<ChatModel>(context, rebuildOnChange: false).init();
     _channel = new SocketControl(widget.nomeMeuUsuario, widget.idMeuUsuario);
+    meuStorage = widget.myLocalStorage;
   }
 
   void _atualizaLista(model) {
@@ -236,9 +239,7 @@ class _TelaChatState extends State<TelaChat> {
               icon: new Icon(Icons.exit_to_app),
               tooltip: 'Sair do Chat',
               onPressed: () {
-                _meusUsuarios.clear();
-                _minhasMensagens.clear();
-                _channel.destroySocket();
+                limpezaDeDados();
                 Navigator.pop(context);
               })
         ],
@@ -282,9 +283,17 @@ class _TelaChatState extends State<TelaChat> {
 
   //=================================================================================================
 
+  void limpezaDeDados([LocalStorage meuStorage]) async {
+    _meusUsuarios.clear();
+    _minhasMensagens.clear();
+    _channel.chatModel.storageSetMensagens();
+    _channel.destroySocket();
+    await meuStorage?.clear();
+  }
+
   @override
   void dispose() {
-    _channel.destroySocket();
+    limpezaDeDados(meuStorage);
     super.dispose();
   }
 }

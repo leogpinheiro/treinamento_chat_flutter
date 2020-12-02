@@ -1,9 +1,10 @@
-import 'dart:convert';
 import 'package:localstorage/localstorage.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'Objetos/Usuario.dart';
 import 'Objetos/Sala.dart';
 import 'Objetos/Mensagem.dart';
+import 'dart:convert';
+import 'dart:math';
 
 class ChatModel extends Model {
   List<Sala> salas = List<Sala>();
@@ -13,6 +14,7 @@ class ChatModel extends Model {
 
   void init() {
     adicionaSala('Geral');
+    storageUpdateMensagens();
   }
 
 //=============================================================================================================================
@@ -26,37 +28,86 @@ class ChatModel extends Model {
     print('\n\n Cheguei aqui usuario \n\n');
   }
 
-  //................................................................................................................................
-
-  void storageSetSalas(List<Sala> salasAlvo) {
-    //final List<Sala> minhasSalas = new List<Sala>.from([...salasAlvo]);
-    //final Map mapaUsuarios = {};
-    //final Map mapaMensagens = {};
-    /*
-    minhasSalas.forEach((sala) {
-      final qtdMensagens = sala.mensagens.length;
-      final indiceMinimo = max(0, qtdMensagens - 10);
-      final mensagensRangeAlvo = new List<Mensagem>.from(sala.mensagens.getRange(indiceMinimo, qtdMensagens));
-      sala.mensagens = mensagensRangeAlvo;
-      sala.jsonMensagens = jsonEncode(mensagensRangeAlvo);
-    });
-
-    myLocalStorage.deleteItem('salas');
-    myLocalStorage.setItem('salas', jsonEncode(minhasSalas));
-    */
-    salas = salasAlvo;
-  }
-
-  //................................................................................................................................
+  //
 
   storageGetUsuario() {
     return myLocalStorage.getItem('usuario');
   }
 
-  //................................................................................................................................
+//=============================================================================================================================
 
-  void storageUpdateSalas() {
-    salas = json.decode(myLocalStorage.getItem('salas'))?.toList() ?? salas;
+  // A função abaixo (storageSetSalas) deve ser chamada quando o app encerrar
+  void storageSetMensagens() {
+    final List<Sala> minhasSalas = new List<Sala>.from([...salas]);
+    String conjuntoMensagens = '';
+
+    if (minhasSalas.length > 0) {
+      print('\n >>>>>>>>>>>> Entrei na funcao storageSetSalas <<<<<<< \n\n');
+
+      minhasSalas.forEach((sala) {
+        final List<Mensagem> rangeMensagensAlvo = coletaUltimasMensagens(sala.mensagens, 10);
+
+        String mensagensNaSala = '';
+
+        rangeMensagensAlvo.forEach((mensagem) {
+          //final String mensagemAlvo = json.encode();
+          mensagensNaSala += json.encode({'mensagem': mensagem.mensagem, 'momento': mensagem.momento, 'clientId': mensagem.clientId, 'clientNome': mensagem.clientNome}) + ",";
+        });
+        conjuntoMensagens += '{"' + sala.nome + '": [' + mensagensNaSala.substring(0, mensagensNaSala.length - 1) + ']},';
+      });
+
+      conjuntoMensagens = conjuntoMensagens.replaceAll('\\', '');
+      conjuntoMensagens = '{"Salas": [' + conjuntoMensagens.substring(0, conjuntoMensagens.length - 1) + ']}';
+
+      print('jsonConjuntoMensagens:');
+      print(conjuntoMensagens);
+
+      myLocalStorage.deleteItem('mensagens');
+      myLocalStorage.setItem('mensagens', conjuntoMensagens);
+      //storageUpdateMensagens();
+    }
+  }
+
+  //
+
+  Future<void> storageUpdateMensagens() async {
+    bool estouPronto = await myLocalStorage?.ready ?? false;
+
+    if (estouPronto) {
+      final String retornoMensagensJson = await myLocalStorage?.getItem('mensagens') ?? '';
+
+      print('\n\n>>>>>>>> retornoMensagensJson: > $retornoMensagensJson < \n\n');
+
+      if (retornoMensagensJson != '' && retornoMensagensJson != null) {
+        final Map conjuntoRetorno = json.decode(retornoMensagensJson);
+        final List<dynamic> listaSalas = conjuntoRetorno['Salas'];
+
+        print('>>>>>>>> ${listaSalas.runtimeType} : $listaSalas');
+
+        listaSalas.asMap().forEach((chave, conjuntoAlvo) {
+          print('>>>>>>>> ${conjuntoAlvo.runtimeType} : $conjuntoAlvo');
+
+          final Map conjuntoMensagens = conjuntoAlvo;
+
+          for (final String nomeSala in conjuntoMensagens.keys) {
+            adicionaSala(nomeSala);
+            final dados = conjuntoMensagens[nomeSala];
+            //adicionaMensagem(dados['sala'], dados['mensagem'], dados['momento'], dados['clientId'], dados['nome']);
+            print('>>>>>>> Nome sala: $nomeSala e conteudo = ${conjuntoMensagens[nomeSala]}');
+            print('>>>>>>> ${dados.runtimeType} : $dados');
+          }
+        });
+        notifyListeners();
+      }
+    }
+  }
+
+  //
+
+  List<Mensagem> coletaUltimasMensagens(List<Mensagem> mensagens, int qtdDesejada) {
+    final qtdMensagens = mensagens.length;
+    final indiceMinimo = max(0, qtdMensagens - qtdDesejada);
+    return new List<Mensagem>.from(mensagens.getRange(indiceMinimo, qtdMensagens));
   }
 
 //=============================================================================================================================
@@ -89,8 +140,6 @@ class ChatModel extends Model {
     if (!checaSalaExiste(nomeSala)) {
       salas.add(instanciaSala);
     }
-    print('\n\n Cheguei aqui 1 \n\n');
-    storageSetSalas(salas);
   }
 
 //=============================================================================================================================

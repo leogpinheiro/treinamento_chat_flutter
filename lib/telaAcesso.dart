@@ -83,7 +83,7 @@ class _MyHomePageState extends State<MyHomePage> {
 //========================================================================================================================================
 
   Widget telaCarregamento(bool redireciona, String nomeUsuarioAlvo) {
-    Future.delayed(const Duration(seconds: 2), () => {redireciona ? goToMainPage(nomeUsuarioAlvo, context) : null});
+    Future.delayed(const Duration(seconds: 3), () => {redireciona ? goToMainPage(nomeUsuarioAlvo, context) : null});
     return Scaffold(
       body: Center(
         child: Container(
@@ -132,7 +132,7 @@ class _MyHomePageState extends State<MyHomePage> {
               return telaDeAcesso();
             }
           } else {
-            return telaCarregamento(false, '');
+            return telaDeAcesso();
           }
         },
       ),
