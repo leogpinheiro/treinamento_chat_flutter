@@ -48,7 +48,7 @@ class _TelaChatState extends State<TelaChat> {
 //=================================================================================================
 
   Widget buildSingleMessage(Mensagem mensagem) {
-    bool souEu = mensagem.clientId == _channel.meuUsuario.idUsuario;
+    bool souEu = (mensagem.clientId == (_channel.meuUsuario?.idUsuario ?? _channel.idPrevio));
 
     return Container(
       decoration: BoxDecoration(
@@ -283,17 +283,16 @@ class _TelaChatState extends State<TelaChat> {
 
   //=================================================================================================
 
-  void limpezaDeDados([LocalStorage meuStorage]) async {
+  void limpezaDeDados() async {
     _meusUsuarios.clear();
     _minhasMensagens.clear();
     _channel.chatModel.storageSetMensagens();
-    _channel.destroySocket();
-    await meuStorage?.clear();
+    await _channel.destroySocket();
   }
 
   @override
-  void dispose() {
-    limpezaDeDados(meuStorage);
+  void dispose() async {
+    limpezaDeDados();
     super.dispose();
   }
 }

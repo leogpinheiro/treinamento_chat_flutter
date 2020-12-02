@@ -1,5 +1,6 @@
 import 'package:localstorage/localstorage.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:testechatleo/constants.dart';
 import 'Objetos/Usuario.dart';
 import 'Objetos/Sala.dart';
 import 'Objetos/Mensagem.dart';
@@ -14,6 +15,8 @@ class ChatModel extends Model {
 
   void init() {
     adicionaSala('Geral');
+    print('\n\n myLocalStorage: $myLocalStorage \n\n');
+    myLocalStorage = myLocalStorage ?? new LocalStorage(LOCALSTORAGE_DAFEULT);
     storageUpdateMensagens();
   }
 
@@ -51,7 +54,7 @@ class ChatModel extends Model {
 
         rangeMensagensAlvo.forEach((mensagem) {
           //final String mensagemAlvo = json.encode();
-          mensagensNaSala += json.encode({'mensagem': mensagem.mensagem, 'momento': mensagem.momento, 'clientId': mensagem.clientId, 'clientNome': mensagem.clientNome}) + ",";
+          mensagensNaSala += json.encode({'mensagem': mensagem.mensagem, 'momento': mensagem.momento, 'clientId': mensagem.clientId, 'nome': mensagem.clientNome}) + ",";
         });
         conjuntoMensagens += '{"' + sala.nome + '": [' + mensagensNaSala.substring(0, mensagensNaSala.length - 1) + ']},';
       });
@@ -59,19 +62,18 @@ class ChatModel extends Model {
       conjuntoMensagens = conjuntoMensagens.replaceAll('\\', '');
       conjuntoMensagens = '{"Salas": [' + conjuntoMensagens.substring(0, conjuntoMensagens.length - 1) + ']}';
 
-      print('jsonConjuntoMensagens:');
-      print(conjuntoMensagens);
-
+      print('jsonConjuntoMensagens: $conjuntoMensagens');
       myLocalStorage.deleteItem('mensagens');
       myLocalStorage.setItem('mensagens', conjuntoMensagens);
-      //storageUpdateMensagens();
     }
   }
 
   //
 
   Future<void> storageUpdateMensagens() async {
-    bool estouPronto = await myLocalStorage?.ready ?? false;
+    bool estouPronto = await myLocalStorage.ready;
+
+    print('\n\n>>>>>>>> estouPronto: > $estouPronto < \n\n');
 
     if (estouPronto) {
       final String retornoMensagensJson = await myLocalStorage?.getItem('mensagens') ?? '';
@@ -91,10 +93,13 @@ class ChatModel extends Model {
 
           for (final String nomeSala in conjuntoMensagens.keys) {
             adicionaSala(nomeSala);
-            final dados = conjuntoMensagens[nomeSala];
-            //adicionaMensagem(dados['sala'], dados['mensagem'], dados['momento'], dados['clientId'], dados['nome']);
-            print('>>>>>>> Nome sala: $nomeSala e conteudo = ${conjuntoMensagens[nomeSala]}');
-            print('>>>>>>> ${dados.runtimeType} : $dados');
+            final List<dynamic> mensagens = conjuntoMensagens[nomeSala];
+
+            mensagens.forEach((mensagem) {
+              mensagem['sala'] = nomeSala;
+              print('>>>>>>> Nome sala: $nomeSala e conteudo = ${conjuntoMensagens[nomeSala]} e ${mensagem.runtimeType} : $mensagem');
+              adicionaMensagem(mensagem);
+            });
           }
         });
         notifyListeners();
@@ -151,6 +156,7 @@ class ChatModel extends Model {
       nomeSalaAlvo?.mensagens?.add(instanciaMensagem);
     }
     notifyListeners();
+    storageSetMensagens();
   }
 
 //=============================================================================================================================

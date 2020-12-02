@@ -82,8 +82,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
 //========================================================================================================================================
 
-  Widget telaCarregamento(bool redireciona, String nomeUsuarioAlvo) {
-    Future.delayed(const Duration(seconds: 3), () => {redireciona ? goToMainPage(nomeUsuarioAlvo, context) : null});
+  Widget telaCarregamento(String nomeUsuarioAlvo) {
+    Future.delayed(const Duration(seconds: 3), () => {goToMainPage(nomeUsuarioAlvo, context)});
     return Scaffold(
       body: Center(
         child: Container(
@@ -93,7 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               Text("- Carregando -"),
               SizedBox(height: 10.0),
-              Text(redireciona ? "Entrando no chat na sala Geral" : "Abrindo tela de acesso"),
+              Text("Entrando no chat na sala Geral"),
               SizedBox(height: 30.0),
               CircularProgressIndicator(),
             ],
@@ -118,13 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
               if (usuarioAlvo != null) {
                 idUsuarioAlvo = json.decode(usuarioAlvo)['id'];
                 String nomeUsuarioAlvo = json.decode(usuarioAlvo)['nome'];
-
-                print('\n idUsuarioAlvo \n');
-                print(idUsuarioAlvo);
-                print('\n nomeUsuarioAlvo \n');
-                print(nomeUsuarioAlvo);
-
-                return telaCarregamento(true, nomeUsuarioAlvo);
+                return telaCarregamento(nomeUsuarioAlvo);
               } else {
                 return telaDeAcesso();
               }
